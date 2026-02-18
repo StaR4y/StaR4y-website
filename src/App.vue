@@ -4,6 +4,7 @@ import Loading from "@/components/Loading.vue";
 import { useThemeStore } from "@/stores/theme";
 import Background from "@/components/Background.vue";
 import { Collections } from './util/collections.ts'
+import { Analytics } from '@vercel/analytics/vue';
 
 const themeStore = useThemeStore();
 const isLoaded = ref(false);
@@ -30,6 +31,7 @@ img.onload = () => {
 
 <template>
   <div :style="{ '--bg-url': `url(${bgUrl})` }">
+    <Analytics />
     <Transition name="page-fade">
       <Loading v-if="showLoading" @close="handleClose" />
     </Transition>
