@@ -3,6 +3,7 @@ import { ref, provide } from 'vue';
 import Loading from "@/components/Loading.vue";
 import { useThemeStore } from "@/stores/theme";
 import Background from "@/components/Background.vue";
+import { Collections } from './util/collections.ts'
 
 const themeStore = useThemeStore();
 const isLoaded = ref(false);
@@ -14,7 +15,11 @@ const handleClose = () => {
   showLoading.value = false;
 };
 
-const bgUrl = "http://www.uapis.cn/api/v1/random/image?category=acg&type=pc";
+const bgs = [
+    "amia.jpg","ena.png"
+]
+
+const bgUrl = `/assets/${Collections.getRandomItem(bgs)}`;
 const img = new Image();
 img.src = bgUrl;
 img.onload = () => {

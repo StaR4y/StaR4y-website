@@ -1,6 +1,5 @@
 <script setup>
 
-import Background from "@/components/Background.vue";
 import ThemeSwitcher from "@/components/ThemeSwitcher.vue";
 import MainCard from "@/components/MainCard.vue";
 import CurrentTime from "@/components/CurrentTime.vue";
