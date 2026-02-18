@@ -1,26 +1,40 @@
 <script setup>
-
 import ThemeSwitcher from "@/components/ThemeSwitcher.vue";
 import MainCard from "@/components/MainCard.vue";
 import CurrentTime from "@/components/CurrentTime.vue";
 import Footer from "@/components/Footer.vue";
 import Navbar from "@/components/Navbar.vue";
+NeteaseMiniPlayer.init();
 </script>
 
 <template>
-  <ThemeSwitcher class="theme-switcher" />
-  <Navbar />
-  <CurrentTime />
-  <MainCard />
-  <Footer />
+  <div class="app-container">
+    <ThemeSwitcher class="theme-switcher" />
+    <Navbar />
+    <main class="content">
+      <CurrentTime />
+      <MainCard />
+    </main>
+    <Footer />
+  </div>
 </template>
 
-<style scoped>
+<style>
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content {
+  flex: 1;
+}
+
 .theme-switcher {
-  position: absolute;
-  top: auto;
+  position: fixed;
   right: 1vmin;
   bottom: 1vmin;
-  left: auto;
+  z-index: 100;
 }
 </style>

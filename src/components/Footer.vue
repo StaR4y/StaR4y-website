@@ -56,8 +56,10 @@
 
 @media (max-width: 600px) {
   .footer {
-    position: static;
-    padding: 2rem 0;
+    position: relative;
+    clear: both;
+    margin-top: auto;
+    padding: 3rem 0;
   }
 }
 </style>
