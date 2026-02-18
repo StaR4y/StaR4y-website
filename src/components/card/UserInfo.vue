@@ -2,7 +2,7 @@
   <div class="user-info">
     <h1 class="name">Moe Jiyun233</h1>
     <div class="divider"></div>
-    <p class="bio">你说得对 You're right あなたは正解です</p>
+    <p class="bio">声に出すのは簡単で でも伝えるのは難しくて</p>
   </div>
 </template>
 

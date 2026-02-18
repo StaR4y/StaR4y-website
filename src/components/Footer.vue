@@ -4,6 +4,9 @@
       <p class="copyright">
         &copy; {{ new Date().getFullYear() }} <span>Moe Jiyun233</span>. All rights reserved.
       </p>
+      <div class="credits">
+          Loading Animation From <a href="https://github.com/Ceale/ceale.moe" target="_blank">Ceale/ceale.moe</a>
+      </div>
       <div class="icp">
         <a href="https://icp.gov.moe/?keyword=20269527" target="_blank">萌ICP备20269527号</a>
       </div>
@@ -26,11 +29,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
   pointer-events: auto;
 }
 
-.copyright, .icp a {
+.copyright, .credits a, .icp a {
   margin: 0;
   font-size: 0.85rem;
   font-weight: 400;
@@ -41,13 +43,20 @@
   transition: opacity 0.3s ease, color 0.3s ease;
 }
 
+.credits {
+  color: var(--text-color);
+  opacity: 0.4;
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
 .copyright span {
   font-weight: 600;
 }
 
-.icp a:hover {
+.credits a:hover, .icp a:hover {
   opacity: 0.9;
-  color: var(--primary-color);
+  color: var(--track-border);
 }
 
 .copyright:hover {
