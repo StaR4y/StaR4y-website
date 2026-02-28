@@ -28,7 +28,7 @@ onUnmounted(() => clearInterval(timer));
 <style scoped>
 .time-container {
   position: absolute;
-  top: 25%;
+  top: 20%;
   left: 50%;
   transform: translateX(-50%);
   z-index: 5;
