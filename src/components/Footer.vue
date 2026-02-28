@@ -2,14 +2,19 @@
   <footer class="footer">
     <div class="footer-content">
       <p class="copyright">
-        &copy; {{ new Date().getFullYear() }} <span>Moe Jiyun233</span>. All rights reserved.
+        &copy; {{ new Date().getFullYear() }} <span class="brand">Moe Jiyun233</span>. All Rights Reserved.
       </p>
-      <div class="credits">
-          Loading Animation From <a href="https://github.com/Ceale/ceale.moe" target="_blank">Ceale/ceale.moe</a>
-      </div>
+
       <div class="icp">
-        <a href="https://icp.gov.moe/?keyword=20269527" target="_blank">萌ICP备20269527号</a>
-        <a href="https://beian.miit.gov.cn/#/Integrated/" target="_blank">闽ICP备2026006101号-1</a>
+        <a href="https://icp.gov.moe/?keyword=20269527" target="_blank" class="icp-link">萌ICP备20269527号</a>
+        <a href="https://beian.miit.gov.cn/#/Integrated/" target="_blank" class="icp-link">闽ICP备2026006101号-1</a>
+      </div>
+
+      <div class="service-tag">
+        <a href="https://www.tencentcloud.com/products/edgeone" target="_blank" rel="noopener noreferrer">
+          <span class="dot"></span>
+          Site Secured & Accelerated by Tencent Cloud EdgeOne (Pages, Security, CDN)
+        </a>
       </div>
     </div>
   </footer>
@@ -21,7 +26,7 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  padding: 1.5rem 0;
+  padding: 0.35rem 0;
   z-index: 10;
   pointer-events: none;
 }
@@ -30,53 +35,85 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 0.1rem;
   pointer-events: auto;
 }
 
-.copyright, .credits a, .icp a {
+.copyright, .service-tag a, .icp-link {
   margin: 0;
-  font-size: 0.75rem;
-  font-weight: 400;
+  font-size: 0.7rem;
   color: var(--text-color);
-  opacity: 0.65;
+  opacity: 0.5;
   text-decoration: none;
-  letter-spacing: 0.02em;
-  transition: opacity 0.3s ease, color 0.3s ease;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.icp a {
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.credits {
-  color: var(--text-color);
-  opacity: 0.4;
-  font-size: 0.75rem;
+.copyright {
   font-weight: 400;
+  letter-spacing: 0.01em;
 }
 
-.copyright span {
+.copyright .brand {
   font-weight: 600;
+  opacity: 0.85;
 }
 
-.credits a:hover, .icp a:hover {
+.icp {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.icp-link {
+  font-size: 0.75rem;
+  padding: 0.02rem 0.35rem;
+  border-radius: 4px;
+  background-color: rgba(128, 128, 128, 0.03);
+  border: 1px solid rgba(128, 128, 128, 0.06);
+}
+
+.icp-link:hover {
   opacity: 0.9;
   color: var(--track-border);
+  background-color: rgba(128, 128, 128, 0.06);
+  border-color: var(--track-border);
+  box-shadow: 0 0 10px rgba(var(--track-border-rgb, 128, 128, 128), 0.2);
+  transform: translateY(-0.5px);
 }
 
-.copyright:hover {
-  opacity: 0.8;
+.service-tag a {
+  font-size: 0.65rem;
+  opacity: 0.4;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.service-tag .dot {
+  width: 3px;
+  height: 3px;
+  background-color: var(--track-border, currentColor);
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 4px var(--track-border);
+}
+
+.service-tag a:hover {
+  opacity: 0.7;
+  color: var(--track-border);
+  text-shadow: 0 0 8px var(--track-border);
 }
 
 @media (max-width: 600px) {
   .footer {
     position: relative;
-    clear: both;
-    margin-top: auto;
-    padding: 3rem 0;
+    padding: 1.2rem 0;
+    margin-top: 1.5rem;
   }
 }
 </style>
+
 <script setup lang="ts">
 </script>

@@ -34,8 +34,16 @@ const url = `url("${MOJANG}")`
 <template>
   <section :style="{ background: bg }">
     <div class="logo" :style="{ 'background-image': url }"></div>
-    <div class="background">
-      <div class="fill" :style="{ width: width+'%' }"></div>
+    <div class="progress-container">
+      <div class="background">
+        <div class="fill" :style="{ width: width+'%' }"></div>
+      </div>
+      <div class="loading-credit">
+        Loading Animation From
+        <a href="https://github.com/Ceale/ceale.moe" target="_blank" rel="noopener noreferrer">
+          Ceale/ceale.moe
+        </a>
+      </div>
     </div>
   </section>
 </template>
@@ -48,21 +56,30 @@ section {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
 
 .logo {
-  position: relative;
   width: 60vmin;
   height: 20vmin;
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
+  margin-bottom: 20vh;
 }
 
-.background {
+.progress-container {
   position: fixed;
   bottom: 10vh;
   width: 75%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2vmin;
+}
+
+.background {
+  width: 100%;
   height: 3vmin;
   padding: 0.5vmin;
   box-sizing: border-box;
@@ -73,5 +90,35 @@ section {
   height: 100%;
   background-color: #ffffff;
   transition: width 400ms ease-out;
+}
+
+.loading-credit {
+  font-size: 1.4vmin;
+  color: #ffffff;
+  opacity: 0.5;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+  transition: opacity 0.3s ease;
+}
+
+.loading-credit a {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.loading-credit a:hover {
+  opacity: 1;
+  border-bottom-color: rgba(255, 255, 255, 0.6);
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+}
+
+@media (max-width: 600px) {
+  .loading-credit {
+    font-size: 2.5vmin;
+  }
 }
 </style>
