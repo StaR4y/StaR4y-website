@@ -9,6 +9,7 @@
       </div>
       <div class="icp">
         <a href="https://icp.gov.moe/?keyword=20269527" target="_blank">萌ICP备20269527号</a>
+        <a href="https://beian.miit.gov.cn/#/Integrated/" target="_blank">闽ICP备2026006101号-1</a>
       </div>
     </div>
   </footer>
@@ -34,13 +35,18 @@
 
 .copyright, .credits a, .icp a {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 400;
   color: var(--text-color);
-  opacity: 0.4;
+  opacity: 0.65;
   text-decoration: none;
   letter-spacing: 0.02em;
   transition: opacity 0.3s ease, color 0.3s ease;
+}
+
+.icp a {
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
 .credits {
@@ -72,3 +78,5 @@
   }
 }
 </style>
+<script setup lang="ts">
+</script>
