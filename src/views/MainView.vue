@@ -10,12 +10,10 @@ NeteaseMiniPlayer.init();
 <template>
   <div class="app-container">
     <ThemeSwitcher class="theme-switcher" />
-    <Navbar />
     <main class="content">
       <CurrentTime />
       <MainCard />
     </main>
-    <Footer />
   </div>
 </template>
 

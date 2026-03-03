@@ -5,6 +5,8 @@ import { useThemeStore } from "@/stores/theme";
 import Background from "@/components/Background.vue";
 import { Collections } from './util/collections.ts'
 import { Analytics } from '@vercel/analytics/vue';
+import Navbar from "@/components/Navbar.vue";
+import Footer from "@/components/Footer.vue";
 
 const themeStore = useThemeStore();
 const isLoaded = ref(false);
@@ -30,12 +32,16 @@ img.onload = () => {
 </script>
 
 <template>
-  <div :style="{ '--bg-url': `url(${bgUrl})` }">
+  <div class="app-wrapper" :style="{ '--bg-url': `url(${bgUrl})` }">
     <Analytics />
     <Transition name="page-fade">
       <Loading v-if="showLoading" @close="handleClose" />
     </Transition>
-    <RouterView />
+    <Navbar />
+    <main class="main-content">
+      <RouterView />
+    </main>
+    <Footer />
     <Background />
   </div>
 </template>
@@ -47,6 +53,20 @@ body, html {
   width: 100%;
   height: 100%;
   overflow: hidden;
+}
+
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 60px;
 }
 
 .page-fade-leave-active {

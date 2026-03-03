@@ -44,7 +44,7 @@ const navigate = (path: string) => {
   position: fixed;
   top: 2rem;
   right: 2rem;
-  z-index: 100;
+  z-index: 100 !important;
   display: flex;
   align-items: center;
   gap: 0.8rem;

@@ -1,6 +1,10 @@
 <template>
   <footer class="footer">
     <div class="footer-content">
+      <a href="#">
+        <img src="https://count.getloli.com/get/@jiyun233" alt="rule34" />
+      </a>
+
       <p class="copyright">
         &copy; {{ new Date().getFullYear() }} <span class="brand">Moe Jiyun233</span>. All Rights Reserved.
       </p>
@@ -108,9 +112,25 @@
 
 @media (max-width: 600px) {
   .footer {
-    position: relative;
-    padding: 1.2rem 0;
-    margin-top: 1.5rem;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+
+    padding: 0.5rem 0;
+    background: transparent;
+    z-index: 10;
+
+    pointer-events: none;
+  }
+
+  .footer-content {
+    pointer-events: auto;
+    gap: 0.05rem;
+  }
+
+  .copyright, .service-tag a, .icp-link {
+    font-size: 0.6rem;
   }
 }
 </style>

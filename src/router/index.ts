@@ -10,6 +10,11 @@ const router = createRouter({
             component: () => import('../views/MainView.vue'),
         },
         {
+            path: '/about',
+            name: 'about',
+            component: () => import('../views/AboutView.vue'),
+        },
+        {
             path: '/:pathMatch(.*)*',
             name: 'NotFound',
             component: NotFound
