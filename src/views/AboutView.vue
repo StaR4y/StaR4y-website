@@ -7,28 +7,58 @@ const showAvatarDesc = ref(false);
 
 <template>
   <div class="global">
-    <Avatar @click="showAvatarDesc = !showAvatarDesc" />
-    <Transition name="slide-fade">
-      <div v-if="showAvatarDesc" class="avatar-desc">
-        Character from TUYU's album
-        <span class="album-name">"アンダーメンタリティ"</span>
+    <div class="content-wrapper">
+      <Avatar @click="showAvatarDesc = !showAvatarDesc" class="avatar-item" />
+
+      <div class="desc-anchor">
+        <Transition name="slide-fade">
+          <div v-if="showAvatarDesc" class="avatar-desc">
+            Character from TUYU's album
+            <span class="album-name">"アンダーメンタリティ"</span>
+          </div>
+        </Transition>
       </div>
-    </Transition>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .global {
   display: flex;
-  align-items: center;
   justify-content: center;
-  margin-top: 2rem;
+  align-items: flex-start;
+  width: 100%;
+  padding-top: 4rem;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.content-wrapper {
+  display: flex;
   flex-direction: column;
+  align-items: center;
+  width: min-content;
+  position: relative;
+}
+
+.desc-anchor {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+
+  display: flex;
+  justify-content: center;
+  width: 100vw;
+  pointer-events: none;
 }
 
 .avatar-desc {
-  margin-top: 1.5rem;
-  white-space: nowrap;
+  pointer-events: auto;
+  position: absolute;
+  top: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
   font-size: 1rem;
   font-weight: 600;
   padding: 0.5rem 1rem;
@@ -38,6 +68,12 @@ const showAvatarDesc = ref(false);
   background-clip: text;
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 0 10px rgba(192, 132, 252, 0.4));
+}
+
+.avatar-item {
+  cursor: pointer;
+  flex-shrink: 0;
+  z-index: 2;
 }
 
 .album-name {
@@ -59,7 +95,7 @@ const showAvatarDesc = ref(false);
 /*noinspection ALL*/
 .slide-fade-enter-from,
 .slide-fade-leave-to {
-  transform: translateY(-20px);
+  transform: translate(-50%, -10px);
   opacity: 0;
   filter: blur(4px);
 }
