@@ -66,17 +66,22 @@ body, html {
   flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: center;
   padding-bottom: 60px;
+  width: 100%;
 }
 
+/*noinspection ALL*/
 .page-fade-leave-active {
   transition: opacity 800ms ease !important;
 }
 
+/*noinspection ALL*/
 .page-fade-leave-to {
   opacity: 0 !important;
 }
 
+/*noinspection ALL*/
 .page-fade-leave-from {
   opacity: 1;
 }
