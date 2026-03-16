@@ -76,7 +76,8 @@ onUnmounted(() => {
 
 
         <InfoCard icon="🎵" label="Listening to" value="TUYU" subValue="アンダーメンタリティ" :col-span="2" :delay="200" />
-        <InfoCard icon="✉️" label="Email" value="moe@example.com" link="koishi@origin.pw" :delay="300" />
+
+        <InfoCard icon="✉️" label="Email" value="koishi@origin.pw" link="mailto:koishi@origin.pw" :delay="300" />
       </div>
     </TransitionGroup>
   </div>
