@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { ref, provide } from 'vue';
+import { computed, onMounted, onUnmounted, provide, ref } from 'vue';
 import Loading from "@/components/Loading.vue";
 import { useThemeStore } from "@/stores/theme";
 import Background from "@/components/Background.vue";
-import { Collections } from './util/collections.ts'
 import { Analytics } from '@vercel/analytics/vue';
 import Navbar from "@/components/Navbar.vue";
 import Footer from "@/components/Footer.vue";
@@ -18,21 +17,87 @@ const handleClose = () => {
   showLoading.value = false;
 };
 
-const bgs = [
-    "amia.jpg","ena.png"
-]
+const backgroundModules = import.meta.glob('./assets/backgrounds/*.{png,jpg,jpeg,webp,avif,gif}', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+}) as Record<string, string>;
 
-const bgUrl = `/assets/${Collections.getRandomItem(bgs)}`;
-const img = new Image();
-img.src = bgUrl;
-img.onload = () => {
-  isLoaded.value = true;
-  document.documentElement.style.setProperty('--bg-url', `url(${bgUrl})`);
+const backgrounds = Object.entries(backgroundModules)
+  .sort(([left], [right]) => left.localeCompare(right))
+  .map(([, url]) => url);
+const bgUrl = ref('');
+const bgImage = computed(() => bgUrl.value ? `url("${bgUrl.value}")` : 'none');
+let currentBackgroundHour = -1;
+let backgroundTimer: number | undefined;
+
+const applyBackground = (url: string, shouldMarkLoaded = false) => {
+  const img = new Image();
+
+  img.onload = () => {
+    bgUrl.value = url;
+    document.documentElement.style.setProperty('--bg-url', `url("${url}")`);
+
+    if (shouldMarkLoaded) {
+      isLoaded.value = true;
+    }
+  };
+
+  img.onerror = () => {
+    if (shouldMarkLoaded) {
+      isLoaded.value = true;
+    }
+  };
+
+  img.src = url;
 };
+
+const getHourlyBackground = (date = new Date()) => {
+  if (backgrounds.length === 0) {
+    return undefined;
+  }
+
+  const daySeed = date.getFullYear() * 372 + date.getMonth() * 31 + date.getDate();
+  const index = (daySeed + date.getHours()) % backgrounds.length;
+
+  return backgrounds[index];
+};
+
+const updateHourlyBackground = (shouldMarkLoaded = false) => {
+  const now = new Date();
+  const nextBackground = getHourlyBackground(now);
+
+  if (!nextBackground) {
+    isLoaded.value = true;
+    return;
+  }
+
+  if (currentBackgroundHour === now.getHours() && bgUrl.value === nextBackground) {
+    if (shouldMarkLoaded) {
+      isLoaded.value = true;
+    }
+    return;
+  }
+
+  currentBackgroundHour = now.getHours();
+  applyBackground(nextBackground, shouldMarkLoaded);
+};
+
+onMounted(() => {
+  updateHourlyBackground(true);
+
+  backgroundTimer = window.setInterval(() => {
+    updateHourlyBackground();
+  }, 60000);
+});
+
+onUnmounted(() => {
+  window.clearInterval(backgroundTimer);
+});
 </script>
 
 <template>
-  <div class="app-wrapper" :style="{ '--bg-url': `url(${bgUrl})` }">
+  <div class="app-wrapper" :style="{ '--bg-url': bgImage }">
     <Analytics />
     <Transition name="page-fade">
       <Loading v-if="showLoading" @close="handleClose" />

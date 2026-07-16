@@ -1,15 +1,20 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 const isOpen = ref(false);
 const router = useRouter();
+const route = useRoute();
 
 const navItems = [
   { name: 'Home', path: '/' },
   { name: 'Projects', path: '/projects' },
-  { name: 'About', path: '/about' }
+  { name: 'Blog', path: '/blog' }
 ];
+
+const isActive = (path: string) => path === '/'
+    ? route.path === '/'
+    : route.path.startsWith(path);
 
 const navigate = (path: string) => {
   router.push(path);
@@ -25,6 +30,7 @@ const navigate = (path: string) => {
           :key="item.path"
           @click="navigate(item.path)"
           class="nav-link"
+          :class="{ active: isActive(item.path) }"
       >
         {{ item.name }}
       </button>
@@ -90,6 +96,11 @@ const navigate = (path: string) => {
 }
 
 .nav-link:hover {
+  background: var(--text-color-light);
+  color: var(--primary-color);
+}
+
+.nav-link.active {
   background: var(--text-color-light);
   color: var(--primary-color);
 }

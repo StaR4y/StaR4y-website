@@ -2,9 +2,6 @@
 import ThemeSwitcher from "@/components/ThemeSwitcher.vue";
 import MainCard from "@/components/MainCard.vue";
 import CurrentTime from "@/components/CurrentTime.vue";
-import Footer from "@/components/Footer.vue";
-import Navbar from "@/components/Navbar.vue";
-NeteaseMiniPlayer.init();
 </script>
 
 <template>

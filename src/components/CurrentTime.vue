@@ -41,12 +41,17 @@ onUnmounted(() => clearInterval(timer));
   letter-spacing: -2px;
   font-family: 'Inter', system-ui, sans-serif;
 
-  background: var(--name-gradient);
+  background: linear-gradient(135deg, #ffffff 0%, #d8d8df 48%, #8f909a 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 
-  opacity: 0.75;
+  opacity: 0.86;
+  text-shadow:
+      0 0 16px rgba(255, 255, 255, 0.36),
+      0 0 36px rgba(210, 210, 220, 0.25),
+      0 0 64px rgba(120, 120, 135, 0.16);
+  filter: drop-shadow(0 0 22px rgba(210, 210, 220, 0.24));
   transition: opacity 0.3s ease;
 }
 

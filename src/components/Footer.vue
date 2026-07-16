@@ -1,18 +1,41 @@
+<script setup lang="ts">
+import { onMounted, ref } from 'vue';
+
+type MoeCounterRecord = {
+  name: string;
+  num: number | string;
+};
+
+const visitCount = ref('...');
+const counterEndpoint = 'https://count.getloli.com/record/@jiyun233';
+
+onMounted(async () => {
+  try {
+    const response = await fetch(counterEndpoint);
+
+    if (!response.ok) {
+      throw new Error(`Counter request failed: ${response.status}`);
+    }
+
+    const data = await response.json() as MoeCounterRecord;
+    const count = Number(data.num);
+
+    visitCount.value = Number.isFinite(count) ? count.toLocaleString() : String(data.num ?? '--');
+  } catch (error) {
+    console.error(error);
+    visitCount.value = '--';
+  }
+});
+</script>
+
 <template>
   <footer class="footer">
     <div class="footer-content">
-      <a href="#">
-        <img src="https://count.getloli.com/get/@jiyun233" alt="rule34" />
-      </a>
+      <span class="visit-count">访问量 {{ visitCount }}</span>
 
       <p class="copyright">
-        &copy; {{ new Date().getFullYear() }} <span class="brand">Moe Jiyun233</span>. All Rights Reserved.
+        &copy; {{ new Date().getFullYear() }} <span class="brand">StaR4y</span>. All Rights Reserved.
       </p>
-
-      <div class="icp">
-        <a href="https://icp.gov.moe/?keyword=20269527" target="_blank" class="icp-link">萌ICP备20269527号</a>
-        <a href="https://beian.miit.gov.cn/#/Integrated/" target="_blank" class="icp-link">闽ICP备2026006101号-1</a>
-      </div>
 
       <div class="service-tag">
         <a href="https://www.tencentcloud.com/products/edgeone" target="_blank" rel="noopener noreferrer">
@@ -43,7 +66,7 @@
   pointer-events: auto;
 }
 
-.copyright, .service-tag a, .icp-link {
+.copyright, .service-tag a, .visit-count {
   margin: 0;
   font-size: 0.7rem;
   color: var(--text-color);
@@ -63,27 +86,8 @@
   opacity: 0.85;
 }
 
-.icp {
-  display: flex;
-  gap: 0.4rem;
-  align-items: center;
-}
-
-.icp-link {
-  font-size: 0.75rem;
-  padding: 0.02rem 0.35rem;
-  border-radius: 4px;
-  background-color: rgba(128, 128, 128, 0.03);
-  border: 1px solid rgba(128, 128, 128, 0.06);
-}
-
-.icp-link:hover {
-  opacity: 0.9;
-  color: var(--track-border);
-  background-color: rgba(128, 128, 128, 0.06);
-  border-color: var(--track-border);
-  box-shadow: 0 0 10px rgba(var(--track-border-rgb, 128, 128, 128), 0.2);
-  transform: translateY(-0.5px);
+.visit-count {
+  font-weight: 500;
 }
 
 .service-tag a {
@@ -129,11 +133,8 @@
     gap: 0.05rem;
   }
 
-  .copyright, .service-tag a, .icp-link {
+  .copyright, .service-tag a, .visit-count {
     font-size: 0.6rem;
   }
 }
 </style>
-
-<script setup lang="ts">
-</script>

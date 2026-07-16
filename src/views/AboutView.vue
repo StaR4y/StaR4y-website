@@ -1,176 +1,526 @@
 <script setup lang="ts">
-import Avatar from "@/components/card/Avatar.vue";
-import {onMounted, onUnmounted, ref} from "vue";
-import InfoCard from "@/components/card/InfoCard.vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
+import { RouterLink } from "vue-router";
+import { publishedPosts } from "@/data/blog";
 
-// icons
-import GitHub from "@/components/icons/GitHub.vue";
-import Sex from "@/components/icons/Sex.vue";
-import Person from "@/components/icons/Person.vue";
-import BiliBili from "@/components/icons/BiliBili.vue";
-import QQ from "@/components/icons/QQ.vue";
+const query = ref("");
+const selectedCategory = ref("全部");
+const selectedTag = ref("全部");
+const sortMode = ref<"newest" | "oldest" | "short">("newest");
 
-const showAvatarDesc = ref(false);
+const categories = computed(() => [
+  "全部",
+  ...Array.from(new Set(publishedPosts.map((post) => post.category))),
+]);
 
-const age = ref('')
+const tags = computed(() => [
+  "全部",
+  ...Array.from(new Set(publishedPosts.flatMap((post) => post.tags))),
+]);
 
-const birthDate = new Date('2007-09-23')
+const featuredPost = computed(() => publishedPosts.find((post) => post.pinned) || publishedPosts[0]);
 
-function updateAge() {
-  const now = new Date()
-  const diffMs = now.getTime() - birthDate.getTime()
-  const years = diffMs / (1000 * 60 * 60 * 24 * 365.25)
-  age.value = years.toFixed(5)
-}
+const filteredPosts = computed(() => {
+  const keyword = query.value.trim().toLowerCase();
 
-let timer: ReturnType<typeof setInterval>
+  return publishedPosts
+    .filter((post) => {
+      const matchesKeyword = !keyword || [
+        post.title,
+        post.excerpt,
+        post.category,
+        ...post.tags,
+      ].some((value) => value.toLowerCase().includes(keyword));
+      const matchesCategory = selectedCategory.value === "全部" || post.category === selectedCategory.value;
+      const matchesTag = selectedTag.value === "全部" || post.tags.includes(selectedTag.value);
+
+      return matchesKeyword && matchesCategory && matchesTag;
+    })
+    .sort((a, b) => {
+      if (sortMode.value === "oldest") return new Date(a.date).getTime() - new Date(b.date).getTime();
+      if (sortMode.value === "short") return a.readingMinutes - b.readingMinutes;
+
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
+});
+
+const archiveGroups = computed(() => {
+  const groups = new Map<string, number>();
+
+  publishedPosts.forEach((post) => {
+    const key = post.date.slice(0, 7);
+    groups.set(key, (groups.get(key) || 0) + 1);
+  });
+
+  return Array.from(groups.entries()).map(([month, count]) => ({ month, count }));
+});
+
+const totalMinutes = computed(() => publishedPosts.reduce((total, post) => total + post.readingMinutes, 0));
+
+const resetFilters = () => {
+  query.value = "";
+  selectedCategory.value = "全部";
+  selectedTag.value = "全部";
+  sortMode.value = "newest";
+};
+
+const formatDate = (value: string) => new Intl.DateTimeFormat("zh-CN", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+}).format(new Date(value));
 
 onMounted(() => {
-  document.body.style.overflowY = 'auto'
-  updateAge()
-  timer = setInterval(updateAge, 10)
-})
+  document.body.style.overflowY = "auto";
+});
 
 onUnmounted(() => {
-  document.body.style.overflowY = 'hidden'
-  clearInterval(timer)
-})
+  document.body.style.overflowY = "hidden";
+});
 </script>
 
 <template>
-  <div class="global">
-    <TransitionGroup name="layout" tag="div" class="group">
-      <Avatar
-          key="avatar"
-          @click="showAvatarDesc = !showAvatarDesc"
-          class="avatar-item"
-      />
+  <div class="blog-page">
+    <section class="blog-shell">
+      <header class="blog-header">
+        <div>
+          <span class="eyebrow">BLOG</span>
+          <h1>记录一些正在发生的学习与折腾</h1>
+          <p>
+            关于前端、项目维护、界面细节和学习节奏的短记录。写得轻一点，但尽量留下能被未来的自己接住的线索。
+          </p>
+        </div>
 
-      <div v-if="showAvatarDesc" key="desc" class="avatar-desc">
-        Character from TUYU's album
-        <span class="album-name">"アンダーメンタリティ"</span>
-      </div>
+        <div class="blog-stats">
+          <div>
+            <strong>{{ publishedPosts.length }}</strong>
+            <span>Posts</span>
+          </div>
+          <div>
+            <strong>{{ categories.length - 1 }}</strong>
+            <span>Categories</span>
+          </div>
+          <div>
+            <strong>{{ totalMinutes }}</strong>
+            <span>Minutes</span>
+          </div>
+        </div>
+      </header>
 
-      <div key="name" class="name">
-        Moe Jiyun233
-      </div>
+      <section v-if="featuredPost" class="featured-post">
+        <div class="featured-meta">
+          <span>Featured</span>
+          <time :datetime="featuredPost.date">{{ formatDate(featuredPost.date) }}</time>
+        </div>
+        <div class="featured-content">
+          <div>
+            <h2>{{ featuredPost.title }}</h2>
+            <p>{{ featuredPost.excerpt }}</p>
+          </div>
+          <RouterLink :to="`/blog/${featuredPost.slug}`" class="read-link">阅读全文</RouterLink>
+        </div>
+      </section>
 
+      <section class="blog-layout">
+        <aside class="blog-sidebar">
+          <div class="control-panel">
+            <label for="blog-search">搜索文章</label>
+            <input id="blog-search" v-model="query" type="search" placeholder="标题、标签、分类..." />
+          </div>
 
-      <div class="cards">
-        <InfoCard icon="✨" label="签名 / Motto" value="声に出すのは簡単で でも伝えるのは難しくて。" :col-span="3" :delay="50" />
+          <div class="control-panel">
+            <label for="blog-sort">排序</label>
+            <select id="blog-sort" v-model="sortMode">
+              <option value="newest">最新优先</option>
+              <option value="oldest">最早优先</option>
+              <option value="short">阅读时间短优先</option>
+            </select>
+          </div>
 
-        <InfoCard :icon="Sex" label="性别 / Sex" value="男 / Male" :tall="true" :delay="150"  fontSize="1.6rem" />
+          <div class="filter-panel">
+            <div class="panel-title">分类</div>
+            <button
+              v-for="category in categories"
+              :key="category"
+              type="button"
+              :class="{ active: selectedCategory === category }"
+              @click="selectedCategory = category"
+            >
+              {{ category }}
+            </button>
+          </div>
 
-        <InfoCard icon="📍" label="居所 / Location" value="中国 / Chinese Mainland" subValue="福建 / Fujian" :tall="true" :delay="150" fontSize="0.9rem" />
+          <div class="filter-panel">
+            <div class="panel-title">标签</div>
+            <button
+              v-for="tag in tags"
+              :key="tag"
+              type="button"
+              :class="{ active: selectedTag === tag }"
+              @click="selectedTag = tag"
+            >
+              {{ tag }}
+            </button>
+          </div>
 
-        <InfoCard :icon="Person" label="年龄 / Age" :value="age" subValue="2007 / 09 / 23" :tall="true" :delay="150" fontSize="1.2rem" />
+          <div class="archive-panel">
+            <div class="panel-title">归档</div>
+            <div v-for="group in archiveGroups" :key="group.month" class="archive-row">
+              <span>{{ group.month }}</span>
+              <span>{{ group.count }}</span>
+            </div>
+          </div>
+        </aside>
 
-        <InfoCard :icon="GitHub" label="GitHub" value="@MoeJiyun233" link="https://github.com/jiyun233" :col-span="2" :delay="100" />
-        <InfoCard icon="💼" label="职业 / Occupation" value="学生 / Student" :delay="250" />
+        <main class="post-list">
+          <div class="list-head">
+            <span>{{ filteredPosts.length }} 篇文章</span>
+            <button type="button" @click="resetFilters">重置筛选</button>
+          </div>
 
-        <InfoCard icon="🛠️" label="技术栈 / Stack" value="Kotlin · Java · Vue · TypeScript · Python · And more stack learning..." :delay="180" :col-span="3" fontSize="1.2rem" />
+          <article v-for="post in filteredPosts" :key="post.slug" class="post-card">
+            <div class="post-meta">
+              <span>{{ post.category }}</span>
+              <time :datetime="post.date">{{ formatDate(post.date) }}</time>
+              <span>{{ post.readingMinutes }} min</span>
+            </div>
+            <h2>{{ post.title }}</h2>
+            <p>{{ post.excerpt }}</p>
+            <div class="tag-row">
+              <button v-for="tag in post.tags" :key="tag" type="button" @click="selectedTag = tag">
+                #{{ tag }}
+              </button>
+            </div>
+            <RouterLink :to="`/blog/${post.slug}`" class="card-link">打开文章</RouterLink>
+          </article>
 
-        <InfoCard icon="🐦" label="Twitter / X" value="@MoeJiyun233" link="https://x.com/moe_neko233" :delay="200" />
-        <InfoCard :icon="BiliBili" label="Bilibili" value="@极云Nya" link="https://space.bilibili.com/245830927" :delay="220" />
-        <InfoCard :icon="QQ" label="QQ" value="3312268214" :delay="240" />
-
-
-        <InfoCard icon="🎵" label="Listening to" value="TUYU" subValue="アンダーメンタリティ" :col-span="2" :delay="200" />
-
-        <InfoCard icon="✉️" label="Email" value="koishi@origin.pw" link="mailto:koishi@origin.pw" :delay="300" />
-      </div>
-    </TransitionGroup>
+          <div v-if="filteredPosts.length === 0" class="empty-state">
+            没有找到符合条件的文章。
+          </div>
+        </main>
+      </section>
+    </section>
   </div>
 </template>
 
 <style scoped>
-.group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
+.blog-page {
+  --glass-bg: rgba(255, 255, 255, 0.13);
+  --glass-bg-strong: rgba(255, 255, 255, 0.2);
+  --glass-border: rgba(255, 255, 255, 0.26);
+  --glass-shadow: 0 20px 55px rgba(0, 0, 0, 0.14);
 
-.global {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   width: 100%;
-  box-sizing: border-box;
-  padding: 4rem 2rem 4rem;
   min-height: 100vh;
-
-  overflow-y: auto;
-
+  padding: 7rem 1.5rem 6rem;
+  color: var(--text-color);
+  box-sizing: border-box;
   opacity: 0;
   animation: pageIn 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
-.avatar-item {
-  cursor: pointer;
-  flex-shrink: 0;
-  z-index: 2;
+.blog-shell {
+  width: min(1080px, 100%);
+  margin: 0 auto;
 }
 
-.avatar-desc {
-  margin-top: .5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  padding: 0.5rem 1rem;
-  text-align: center;
-  background: linear-gradient(135deg, #c084fc 0%, #f472b6 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 10px rgba(192, 132, 252, 0.4));
-}
-
-.album-name {
-  font-style: italic;
-  margin-left: 0.3rem;
-  background: linear-gradient(135deg, #e9d5ff 0%, #fbcfe8 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-decoration: underline dotted rgba(236, 72, 153, 0.3);
-}
-
-.name {
-  font-size: 1.6rem;
-  font-weight: 700;
-  margin-top: 1.2rem;
-  letter-spacing: 0.15em;
-
-  background: linear-gradient(135deg, #e2d4f0 0%, #c084fc 40%, #f472b6 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-
-  filter: drop-shadow(0 0 12px rgba(192, 132, 252, 0.5));
-
-  position: relative;
-}
-
-.name::after {
-  content: '';
-  position: absolute;
-  bottom: -6px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #c084fc, #f472b6, transparent);
-}
-
-.cards {
+.blog-header {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.6rem;
-  width: 100%;
-  max-width: 800px;
-  margin-top: 2rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2rem;
+  align-items: end;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--track-border);
 }
 
+.eyebrow,
+.panel-title {
+  color: var(--primary-color);
+  font-size: 0.76rem;
+  font-weight: 760;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  margin-top: 0.5rem;
+  max-width: 760px;
+  font-size: clamp(2.1rem, 6vw, 4.2rem);
+  line-height: 1.08;
+  font-weight: 850;
+  letter-spacing: 0;
+  background: var(--name-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.blog-header p {
+  max-width: 720px;
+  margin-top: 0.85rem;
+  color: var(--text-color);
+  opacity: 0.72;
+  line-height: 1.8;
+}
+
+.blog-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(86px, 1fr));
+  gap: 0.75rem;
+}
+
+.blog-stats div,
+.featured-post,
+.control-panel,
+.filter-panel,
+.archive-panel,
+.post-card,
+.empty-state {
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.055)),
+    var(--glass-bg);
+  backdrop-filter: blur(28px) saturate(150%);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.blog-stats div {
+  padding: 1rem;
+}
+
+.blog-stats strong {
+  display: block;
+  color: var(--primary-color);
+  font-size: 1.75rem;
+  font-weight: 850;
+  line-height: 1;
+}
+
+.blog-stats span {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--text-color);
+  opacity: 0.58;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.featured-post {
+  margin-top: 2rem;
+  padding: 1.2rem;
+}
+
+.featured-meta,
+.post-meta,
+.list-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--text-color);
+  opacity: 0.58;
+  font-size: 0.78rem;
+}
+
+.featured-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1.5rem;
+  align-items: end;
+  margin-top: 0.8rem;
+}
+
+.featured-content h2,
+.post-card h2 {
+  color: var(--text-color);
+  font-size: 1.35rem;
+  font-weight: 780;
+  line-height: 1.35;
+}
+
+.featured-content p,
+.post-card p {
+  margin-top: 0.55rem;
+  color: var(--text-color);
+  opacity: 0.7;
+  line-height: 1.75;
+}
+
+.blog-layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+  margin-top: 1rem;
+}
+
+.blog-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  position: sticky;
+  top: 6rem;
+}
+
+.control-panel,
+.filter-panel,
+.archive-panel {
+  padding: 1rem;
+}
+
+.control-panel label {
+  display: block;
+  color: var(--primary-color);
+  font-size: 0.72rem;
+  font-weight: 760;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.control-panel input,
+.control-panel select {
+  width: 100%;
+  margin-top: 0.55rem;
+  padding: 0.72rem 0.78rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  color: var(--text-color);
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+}
+
+.control-panel input:focus,
+.control-panel select:focus {
+  border-color: var(--primary-color);
+}
+
+.filter-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.panel-title {
+  width: 100%;
+}
+
+.filter-panel button,
+.tag-row button,
+.list-head button,
+.read-link,
+.card-link {
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  color: var(--text-color);
+  background: rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.filter-panel button {
+  padding: 0.45rem 0.58rem;
+  font-size: 0.78rem;
+}
+
+.filter-panel button.active,
+.filter-panel button:hover,
+.tag-row button:hover,
+.list-head button:hover,
+.read-link:hover,
+.card-link:hover {
+  color: var(--primary-color);
+  border-color: rgba(var(--primary-color-rgb), 0.45);
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.archive-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.7rem;
+  color: var(--text-color);
+  opacity: 0.66;
+  font-size: 0.84rem;
+}
+
+.post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.list-head {
+  justify-content: space-between;
+  opacity: 1;
+}
+
+.list-head button,
+.read-link,
+.card-link {
+  padding: 0.55rem 0.7rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.post-card {
+  padding: 1.1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.post-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.18), transparent 34%),
+    radial-gradient(circle at 92% 8%, rgba(var(--primary-color-rgb), 0.14), transparent 30%);
+}
+
+.post-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.post-card h2 {
+  margin-top: 0.65rem;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 1rem;
+}
+
+.tag-row button {
+  padding: 0.38rem 0.5rem;
+  font-size: 0.76rem;
+}
+
+.card-link {
+  display: inline-block;
+  width: fit-content;
+  margin-top: 1rem;
+}
+
+.empty-state {
+  padding: 2rem;
+  color: var(--text-color);
+  opacity: 0.7;
+  text-align: center;
+}
 
 @keyframes pageIn {
   from {
@@ -183,48 +533,32 @@ onUnmounted(() => {
   }
 }
 
-@media (max-width: 600px) {
-  .cards {
-    grid-template-columns: repeat(2, 1fr);
+[data-theme='dark'] .blog-page {
+  --glass-bg: rgba(16, 18, 28, 0.34);
+  --glass-bg-strong: rgba(24, 27, 42, 0.44);
+  --glass-border: rgba(255, 255, 255, 0.13);
+  --glass-shadow: 0 20px 55px rgba(0, 0, 0, 0.28);
+}
+
+@media (max-width: 900px) {
+  .blog-header,
+  .featured-content,
+  .blog-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .blog-sidebar {
+    position: static;
   }
 }
 
-/*noinspection ALL*/
-.layout-enter-active,
-.layout-leave-active {
-  transition: opacity 0.45s cubic-bezier(0.25, 1, 0.5, 1),
-  filter 0.45s cubic-bezier(0.25, 1, 0.5, 1);
-}
+@media (max-width: 560px) {
+  .blog-page {
+    padding: 6rem 1rem 5rem;
+  }
 
-/*noinspection ALL*/
-.layout-enter-from,
-.layout-leave-to {
-  opacity: 0;
-  filter: blur(4px);
-}
-
-/*noinspection ALL*/
-.layout-leave-active {
-  position: absolute;  /* 👈 离开时脱离文档流 */
-}
-
-/*noinspection ALL*/
-.layout-move {
-  transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-/*noinspection ALL*/
-.slide-fade-enter-active,
-.slide-fade-leave-active {
-  transition: opacity 0.45s cubic-bezier(0.25, 1, 0.5, 1),
-              filter 0.45s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-/*noinspection ALL*/
-.slide-fade-enter-from,
-.slide-fade-leave-to {
-  transform: translateY(-10px);
-  opacity: 0;
-  filter: blur(4px);
+  .blog-stats {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

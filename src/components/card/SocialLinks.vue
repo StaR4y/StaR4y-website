@@ -5,10 +5,10 @@ import QQ from "@/components/icons/QQ.vue";
 import Mail from "@/components/icons/Mail.vue";
 
 const socialLinks = [
-  { icon: GitHub, url: 'https://github.com/jiyun233', label: 'Github' },
-  { icon: BiliBili, url: 'https://space.bilibili.com/245830927', label: 'Bilibili' },
-  { icon: QQ, url: 'tencent://AddContact/?fromId=45&fromSubId=1&subcmd=all&uin=3312268214', label: 'Telegram' },
-  { icon: Mail, url: 'mailto:koishi@origin.pw', label: 'Mail' },
+  { icon: GitHub, url: 'https://github.com/StaR4y', label: 'Github' },
+  { icon: BiliBili, url: 'https://space.bilibili.com/3546670465812484?spm_id_from=333.1007.0.0', label: 'Bilibili' },
+  { icon: QQ, url: 'tencent://AddContact/?fromId=45&fromSubId=1&subcmd=all&uin=1025336361', label: 'Telegram' },
+  { icon: Mail, url: 'mailto:star4y@origin.pw', label: 'Mail' },
 ];
 </script>
 

@@ -1,6 +1,20 @@
+<script setup lang="ts">
+const qq = "1025336361";
+const fallbackAvatar = "/assets/avatar.png";
+const qqAvatar = `https://q1.qlogo.cn/g?b=qq&nk=${qq}&s=640`;
+
+const handleAvatarError = (event: Event) => {
+  const image = event.target as HTMLImageElement;
+
+  if (image.src.endsWith(fallbackAvatar)) return;
+
+  image.src = fallbackAvatar;
+};
+</script>
+
 <template>
   <div class="avatar-wrapper">
-    <img src="/assets/avatar.png" alt="avatar" class="avatar">
+    <img :src="qqAvatar" alt="QQ avatar" class="avatar" referrerpolicy="no-referrer" @error="handleAvatarError">
   </div>
 </template>
 

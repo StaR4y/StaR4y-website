@@ -12,7 +12,22 @@ const router = createRouter({
         {
             path: '/about',
             name: 'about',
+            redirect: '/blog',
+        },
+        {
+            path: '/blog',
+            name: 'blog',
             component: () => import('../views/AboutView.vue'),
+        },
+        {
+            path: '/blog/:slug',
+            name: 'blog-post',
+            component: () => import('../views/BlogPostView.vue'),
+        },
+        {
+            path: '/projects',
+            name: 'projects',
+            component: () => import('../views/ProjectsView.vue'),
         },
         {
             path: '/:pathMatch(.*)*',
